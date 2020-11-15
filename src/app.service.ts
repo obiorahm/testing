@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { getRepository } from 'fireorm';
 
-import { Todo } from './db/db.models'
+import { User } from './user/user.models'
 
 @Injectable()
 export class AppService {
 
   async testMethod(): Promise<any> {
-    const todoRepository = getRepository(Todo);
-    const todo: Todo = await todoRepository.findById('SdJs79MfdHNwqVl7yuHU');
+    const todoRepository = getRepository(User);
+    const todo: User = await todoRepository.findById('bxaYXMAd1va2b5vfUMen');
     return todo;
   }
 }

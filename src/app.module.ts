@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { DbModule } from './db/db.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -13,10 +14,11 @@ import { DbModule } from './db/db.module';
       isGlobal: true,
     }),
     FirebaseModule.forRoot({
-      googleApplicationCredential: "./config/pairuptest-firebase-adminsdk-klpv9-82fa2dd61d.json",
+      googleApplicationCredential: "./config/pairuptest-c28e2c54e056.json",
     }),
     DbModule,
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

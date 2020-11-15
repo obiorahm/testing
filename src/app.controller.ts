@@ -14,9 +14,7 @@ export class AppController {
   @Get()
   async getHello(): Promise<string> {
     const todo = await this.appService.testMethod();
-    const user = await this.userService.getUser();
     console.log(todo)
-    console.log(user)
     return 'Hello World';
   }
 }

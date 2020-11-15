@@ -1,10 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
 
   @Get()
-  async index(): Promise<string> {
+  @UseGuards(AuthGuard('firebase'))
+  async index(@Request() req): Promise<string> {
+    console.log(req.user.uid)
     return 'TEST';
   }
 
