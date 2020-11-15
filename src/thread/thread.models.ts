@@ -7,7 +7,7 @@ export class Thread {
   isReflection: boolean;
   lastMessage?: Message;
   lastMessageAt?: string; // TODO: might get this from lastMessage
-  createdAt: string; // TODO: better date type ?
+  createdAt: Date;
   userIds: Array<string>;
   pairId?: string;
   accountId: string;

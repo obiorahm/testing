@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { FirebaseAdmin, InjectFirebaseAdmin } from 'nestjs-firebase';
-import { auth } from 'firebase-admin'
 import { getRepository } from 'fireorm';
 
 import { User } from './user.models';
@@ -18,18 +17,22 @@ export class UserService {
     return user;
   }
 
+  async createUser(params: any): Promise<any> {
+    const userCollection = getRepository(User);
+    const user = new User();
+    // TODO: create firebase user and assign user.id to firebase uid
+    user.firstName = params.firstName;
+    user.lastName = params.lastName;
+    user.email = params.email;
+    user.isAdmin = params.isAdmin;
+    user.accountId = params.accountId;
+    const result = await userCollection.create(user);
+    return result
+  }
+
   async getFirebaseUser(uid: string) {
     const user = await this.firebase.auth.getUser(uid);
     return user;
-  }
-
-  async verifyFirebaseToken(token: string): Promise<string> {
-    const idToken: auth.DecodedIdToken = await this.firebase.auth.verifyIdToken(token);
-    let uid = null;
-    if (idToken) {
-      uid = idToken.uid;
-    }
-    return uid;
   }
 
 }

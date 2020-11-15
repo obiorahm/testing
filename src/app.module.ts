@@ -8,6 +8,9 @@ import { UserModule } from './user/user.module';
 import { DbModule } from './db/db.module';
 import { AuthModule } from './auth/auth.module';
 import { MessageModule } from './message/message.module';
+import { ThreadService } from './thread/thread.service';
+import { ThreadModule } from './thread/thread.module';
+import { PairModule } from './pair/pair.module';
 
 @Module({
   imports: [
@@ -21,10 +24,13 @@ import { MessageModule } from './message/message.module';
     UserModule,
     AuthModule,
     MessageModule,
+    ThreadModule,
+    PairModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
+    ThreadService,
   ],
 })
 export class AppModule {}
