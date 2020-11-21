@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from './user.models';
 import { UserService } from './user.service';
@@ -14,6 +14,13 @@ export class UserController {
   @UseGuards(AuthGuard('firebase'))
   async index(@Request() req): Promise<User> {
     const user = await this.userService.getUser(req.user.uid);
+    return user;
+  }
+
+  @Get(':userId')
+  @UseGuards(AuthGuard('firebase'))
+  async getById(@Request() req, @Param() params): Promise<User> {
+    const user = await this.userService.getUser(params.userId);
     return user;
   }
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from 'src/user/user.service';
 import { Thread } from './thread.models';
@@ -17,6 +17,13 @@ export class ThreadController {
   async index(@Request() req): Promise<Array<Thread>> {
     const threads = await this.threadService.getUserThreads(req.user.uid);
     return threads;
+  }
+
+  @Get(':threadId')
+  @UseGuards(AuthGuard('firebase'))
+  async getById(@Request() req, @Param() params): Promise<Thread> {
+    const thread: Thread = await this.threadService.getThread(params.threadId);
+    return thread;
   }
 
   @Post('create')

@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { FirebaseAdmin, InjectFirebaseAdmin } from 'nestjs-firebase';
-import { getRepository, IQueryable } from 'fireorm';
+import { getRepository } from 'fireorm';
 import { Thread } from './thread.models';
+
+const THREAD_PAGE_SIZE = 10;
 
 @Injectable()
 export class ThreadService {
@@ -10,10 +12,19 @@ export class ThreadService {
     @InjectFirebaseAdmin() private readonly firebase: FirebaseAdmin
   ) {}
 
+  async getThread(threadId: string) {
+    const threadCollection = getRepository(Thread);
+    const thread: Thread = await threadCollection.findById(threadId);
+    return thread;
+  }
+  
   async getUserThreads(uid: string) {
     const threadCollection = getRepository(Thread);
-    const query: IQueryable<Thread> = threadCollection.whereArrayContains('userIds', uid);
-    const threads: Array<Thread> = await query.find();
+    const threads: Array<Thread> = await threadCollection.whereArrayContains(
+      'userIds', uid
+    ).limit(
+      THREAD_PAGE_SIZE
+    ).find();
     return threads;
   }
 

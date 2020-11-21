@@ -3,6 +3,8 @@ import { FirebaseAdmin, InjectFirebaseAdmin } from 'nestjs-firebase';
 import { getRepository } from 'fireorm';
 import { Pair } from './pair.models';
 
+const PAIR_PAGE_SIZE = 10;
+
 @Injectable()
 export class PairService {
 
@@ -19,6 +21,21 @@ export class PairService {
     pair.createdAt = new Date();
     const result = await pairCollection.create(pair);
     return result
+  }
+
+  async getPairsByUser(userId: string, page: number = 0) {
+    const pairCollection = getRepository(Pair);
+    // TODO: Pagination
+    const pairs: Array<Pair> = await pairCollection.whereArrayContains(
+      'userIds', userId
+    ).whereEqualTo(
+      'isActive', true 
+    ).orderByDescending(
+      'createdAt'
+    ).limit(
+      PAIR_PAGE_SIZE
+    ).find();
+    return pairs;
   }
 
 }
