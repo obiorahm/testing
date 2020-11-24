@@ -30,6 +30,16 @@ export class UserService {
     return result
   }
 
+  async updateUser(userId: string, params: any) {
+    const userCollection = getRepository(User);
+    const user = await userCollection.findById(userId);
+    Object.keys(params).forEach((key) => {
+      user[key] = params[key];
+    })
+    const updatedUser = await userCollection.update(user);
+    return updatedUser;
+  }
+
   async getFirebaseUser(uid: string) {
     const user = await this.firebase.auth.getUser(uid);
     return user;

@@ -34,4 +34,18 @@ export class UserController {
     return result;
   }
 
+  @Post(':userId/push_token')
+  @UseGuards(AuthGuard('firebase'))
+  async startPushNotifications(@Request() req, @Param() params, @Body() body: any): Promise<User> {
+    if (req.user.uid != params.userId) {
+      return;
+    }
+    // Update user
+    const userData = {
+      pushToken: body.pushToken
+    }
+    const user = await this.userService.updateUser(params.userId, userData);
+    return user;
+  }
+
 }

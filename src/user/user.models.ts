@@ -12,5 +12,6 @@ export class User {
   pairId: string; // TODO: should not be needed
   reflectionType: string; // TODO: might not be needed
   showWelcome: boolean;
+  pushToken?: string;
   accountId?: string;
 }
