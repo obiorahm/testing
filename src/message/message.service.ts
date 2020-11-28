@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FirebaseAdmin, InjectFirebaseAdmin } from 'nestjs-firebase';
 import { getRepository } from 'fireorm';
+import fetch from 'node-fetch';
 import { Message } from './message.models';
 import { Thread } from 'src/thread/thread.models';
 import { convertToObject } from 'src/utils';
