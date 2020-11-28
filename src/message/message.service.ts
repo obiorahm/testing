@@ -4,6 +4,7 @@ import { getRepository } from 'fireorm';
 import { Message } from './message.models';
 import { Thread } from 'src/thread/thread.models';
 import { convertToObject } from 'src/utils';
+import { User } from 'src/user/user.models';
 
 const MESSAGE_PAGE_SIZE: number = 10;
 
@@ -45,8 +46,37 @@ export class MessageService {
     await threadCollection.update(thread);
     // Create message
     const result = await messageCollection.create(message);
+    await this.sendPushNotification(result);
     // TODO: send push notification / handle integrations (slack message, etc.)
     return result;
+  }
+
+  async sendPushNotification(message: Message) {
+    if (!message.receiverId) {
+      return;
+    }
+    const userCollection = getRepository(User);
+    const receiver = await userCollection.findById(message.receiverId);
+    const sender = await userCollection.findById(message.senderId);
+    if (!receiver.pushToken) {
+      return;
+    }
+    const notification = {
+      to: receiver.pushToken,
+      sound: 'default',
+      title: 'Message from ' + sender.firstName,
+      body: message.body
+    };
+  
+    await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(notification),
+    });
   }
 
 }
