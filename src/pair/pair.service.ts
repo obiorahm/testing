@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { FirebaseAdmin, InjectFirebaseAdmin } from 'nestjs-firebase';
 import { getRepository } from 'fireorm';
 import { Pair } from './pair.models';
 
@@ -8,9 +7,7 @@ const PAIR_PAGE_SIZE = 10;
 @Injectable()
 export class PairService {
 
-  constructor(
-    @InjectFirebaseAdmin() private readonly firebase: FirebaseAdmin
-  ) {}
+  constructor() {}
 
   async createPair(params: any) {
     const pairCollection = getRepository(Pair);

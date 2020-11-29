@@ -11,6 +11,7 @@ import { MessageModule } from './message/message.module';
 import { ThreadService } from './thread/thread.service';
 import { ThreadModule } from './thread/thread.module';
 import { PairModule } from './pair/pair.module';
+import { PromptModule } from './prompt/prompt.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PairModule } from './pair/pair.module';
     MessageModule,
     ThreadModule,
     PairModule,
+    PromptModule,
   ],
   controllers: [AppController],
   providers: [

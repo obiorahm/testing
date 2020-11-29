@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { FirebaseAdmin, InjectFirebaseAdmin } from 'nestjs-firebase';
 import { getRepository } from 'fireorm';
 import { Thread } from './thread.models';
 
@@ -8,9 +7,7 @@ const THREAD_PAGE_SIZE = 10;
 @Injectable()
 export class ThreadService {
 
-  constructor(
-    @InjectFirebaseAdmin() private readonly firebase: FirebaseAdmin
-  ) {}
+  constructor() {}
 
   async getThread(threadId: string) {
     const threadCollection = getRepository(Thread);

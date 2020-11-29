@@ -11,9 +11,9 @@ export class UserService {
     @InjectFirebaseAdmin() private readonly firebase: FirebaseAdmin
   ) {}
 
-  async getUser(uid: string) {
+  async getUser(userId: string) {
     const userCollection = getRepository(User);
-    const user: User = await userCollection.findById(uid);
+    const user: User = await userCollection.findById(userId);
     return user;
   }
 

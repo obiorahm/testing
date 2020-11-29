@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { FirebaseAdmin, InjectFirebaseAdmin } from 'nestjs-firebase';
 import { getRepository } from 'fireorm';
 import fetch from 'node-fetch';
 import { Message } from './message.models';
@@ -12,9 +11,7 @@ const MESSAGE_PAGE_SIZE: number = 10;
 @Injectable()
 export class MessageService {
 
-  constructor(
-    @InjectFirebaseAdmin() private readonly firebase: FirebaseAdmin
-  ) {}
+  constructor() {}
 
   async getThreadMessages(threadId: string, page: number = 0) {
     const messageCollection = getRepository(Message);
