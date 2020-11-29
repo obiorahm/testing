@@ -48,4 +48,18 @@ export class UserController {
     return user;
   }
 
+  @Post(':userId/avatar')
+  @UseGuards(AuthGuard('firebase'))
+  async changeAvatar(@Request() req, @Param() params, @Body() body: any): Promise<User> {
+    if (req.user.uid != params.userId) {
+      return;
+    }
+    // Update user
+    const userData = {
+      avatarIndex: body.avatarIndex
+    }
+    const user = await this.userService.updateUser(params.userId, userData);
+    return user;
+  }
+
 }
