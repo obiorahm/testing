@@ -31,15 +31,17 @@ export class MessageService {
     const messageCollection = getRepository(Message);
     const message: Message = new Message();
     message.body = params.body;
+    message.type = params.type;
     message.senderId = params.senderId;
     message.receiverId = params.receiverId;
     message.threadId = params.threadId;
     message.pairId = params.pairId;
+    message.promptResponseId = params.promptResponseId;
     message.accountId = params.accountId;
     message.createdAt = new Date();
     // Add to thread
     const threadCollection = getRepository(Thread);
-    const thread = await threadCollection.findById(params.threadId)
+    const thread = await threadCollection.findById(params.threadId);
     thread.lastMessage = convertToObject(message);
     await threadCollection.update(thread);
     // Create message
@@ -55,14 +57,18 @@ export class MessageService {
     }
     const userCollection = getRepository(User);
     const receiver = await userCollection.findById(message.receiverId);
-    const sender = await userCollection.findById(message.senderId);
+    let title = 'New Prompt'
+    if (message.senderId) {
+      const sender = await userCollection.findById(message.senderId);
+      title = 'Message from ' + sender.firstName;
+    }
     if (!receiver.pushToken) {
       return;
     }
     const notification = {
       to: receiver.pushToken,
       sound: 'default',
-      title: 'Message from ' + sender.firstName,
+      title: title,
       body: message.body
     };
   

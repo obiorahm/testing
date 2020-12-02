@@ -3,7 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ThreadService } from 'src/thread/thread.service';
 import { User } from 'src/user/user.models';
 import { UserService } from 'src/user/user.service';
-import { Prompt } from './prompt.models';
+import { Prompt, PromptResponse } from './prompt.models';
 import { PromptService } from './prompt.service';
 
 @Controller('prompt')
@@ -28,30 +28,52 @@ export class PromptController {
     if (!user.isSuperAdmin && user.accountId !== params.accountId) {
       return;
     }
-    // Make sure thread contains users
-    const thread = await this.threadService.getThread(params.threadId);
-    for (let userId of params.userIds) {
-      if (!thread.userIds.includes(userId)) {
-        return;
-      }
+    // If not super admin force account to user's account
+    if (!user.isSuperAdmin) {
+      params.accountId = user.accountId;
     }
+    params.createdById = user.id;
     const result = await this.promptService.createPrompt(params);
     return result;
   }
 
-  @Post(':promptId/response')
+  @Post('send')
   @UseGuards(AuthGuard('firebase'))
-  async createPromptResponse(@Request() req, @Body() body, @Param() params): Promise<Prompt> {
+  async sendNewPrompt(@Request() req, @Body() body): Promise<PromptResponse> {
+    const user: User = await this.userService.getUser(req.user.uid);
+    // Admin only
+    if (!user.isAdmin) {
+      return;
+    }
+    const params: any = body;
+    // Super admin can create prompts for anyone
+    if (!user.isSuperAdmin && user.accountId !== params.accountId) {
+      return;
+    }
+    // Check prompt ownership
+    const prompt: Prompt = await this.promptService.getPrompt(params.promptId);
+    if (!user.isSuperAdmin && prompt.accountId && prompt.accountId !== user.accountId) {
+      return;
+    }
+    const result = await this.promptService.sendPrompt(prompt, user, params);
+    return result;
+  }
+
+  @Post(':promptResponseId/response')
+  @UseGuards(AuthGuard('firebase'))
+  async createPromptResponse(@Request() req, @Body() body, @Param() params): Promise<PromptResponse> {
     const user: User = await this.userService.getUser(req.user.uid);
     const data: any = body;
-    const prompt: Prompt = await this.promptService.getPrompt(params.promptId);
-    if (!prompt.userIds.includes(user.id)) {
+    const promptResponse: PromptResponse = await this.promptService.getPromptResponse(
+      params.promptResponseId
+    );
+    if (promptResponse.userId !== user.id) {
       return;
     }
     const result = await this.promptService.addPromptResponse(
-      prompt,
+      promptResponse,
       user,
-      body.response
+      data.response
     );
     return result;
   }

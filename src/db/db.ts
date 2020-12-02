@@ -8,6 +8,7 @@ export class DbProvider {
   constructor(
     @InjectFirebaseAdmin() private readonly firebase: FirebaseAdmin
   ) {
+    firebase.db.settings({ ignoreUndefinedProperties: true })
     fireorm.initialize(firebase.db);
   }
 
