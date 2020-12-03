@@ -34,39 +34,41 @@ export class PromptService {
   }
 
   // TODO: use transaction
-  async sendPrompt(prompt: Prompt, sender: User, params: any) {
-    // Check thread data to validate
-    const thread: Thread = await this.threadService.getThread(params.threadId);
-    if (!thread || !thread.userIds.includes(params.userId)) {
-      return;
-    }
-    // Create response
+  async sendPrompt(prompt: Prompt, sender: User, thread: Thread) {
+    // Create response for all users in thread
     const promptResponseCollection = getRepository(PromptResponse);
-    const promptResponse: PromptResponse = new PromptResponse();
-    promptResponse.hasResponded = false;
-    promptResponse.promptId = prompt.id;
-    promptResponse.userId = params.userId;
-    promptResponse.threadId = thread.id;
-    promptResponse.pairId = thread.pairId;
-    promptResponse.accountId = thread.accountId;
-    promptResponse.sentById = sender.id;
-    promptResponse.createdAt = new Date();
-    const newResponse: PromptResponse = await promptResponseCollection.create(
-      promptResponse
-    );
+    let newResponses = {} as Array<PromptResponse>;
+    for (let userId of thread.userIds) {
+      const promptResponse: PromptResponse = new PromptResponse();
+      promptResponse.hasResponded = false;
+      promptResponse.promptId = prompt.id;
+      promptResponse.userId = userId;
+      promptResponse.threadId = thread.id;
+      promptResponse.pairId = thread.pairId;
+      promptResponse.accountId = thread.accountId;
+      promptResponse.sentById = sender.id;
+      promptResponse.createdAt = new Date();
+      const newResponse: PromptResponse = await promptResponseCollection.create(
+        promptResponse
+      );
+      newResponses[userId] = newResponse;
+    }
+    let newResponsesMap = {};
+    for (const userId in newResponses) {
+      newResponsesMap[userId] = newResponses[userId].id;
+    }
     // Add message to thread
     let messageData: any = {
       body: prompt.content,
       type: 'prompt',
-      receiverId: newResponse.userId, 
-      threadId: newResponse.threadId,
-      pairId: newResponse.pairId,
-      promptResponseId: newResponse.id,
-      accountId: newResponse.accountId,
+      threadId: thread.id,
+      pairId: thread.pairId,
+      promptResponses: newResponsesMap,
+      accountId: thread.accountId,
       createdAt: new Date()
     }
     await this.messageService.createMessage(messageData)
-    return newResponse;
+    return newResponses;
   }
 
   async getPromptResponse(promptResponseId: string) {

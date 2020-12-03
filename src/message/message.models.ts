@@ -9,7 +9,7 @@ export class Message {
   receiverId?: string; // can be null if prompt response
   threadId: string;
   pairId?: string;
-  promptResponseId?: string; // used to group message with prompt
+  promptResponses?: any; // used to group message with prompt
   accountId: string;
   createdAt: Date;
 }

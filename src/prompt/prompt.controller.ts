@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Thread } from 'src/thread/thread.models';
 import { ThreadService } from 'src/thread/thread.service';
 import { User } from 'src/user/user.models';
 import { UserService } from 'src/user/user.service';
@@ -39,15 +40,18 @@ export class PromptController {
 
   @Post('send')
   @UseGuards(AuthGuard('firebase'))
-  async sendNewPrompt(@Request() req, @Body() body): Promise<PromptResponse> {
+  async sendNewPrompt(@Request() req, @Body() body): Promise<any> {
+    // User is the 'sender' (admin)
     const user: User = await this.userService.getUser(req.user.uid);
     // Admin only
     if (!user.isAdmin) {
       return;
     }
     const params: any = body;
+    // Get thread
+    const thread: Thread = await this.threadService.getThread(params.threadId);
     // Super admin can create prompts for anyone
-    if (!user.isSuperAdmin && user.accountId !== params.accountId) {
+    if (!user.isSuperAdmin && user.accountId !== thread.accountId) {
       return;
     }
     // Check prompt ownership
@@ -55,7 +59,7 @@ export class PromptController {
     if (!user.isSuperAdmin && prompt.accountId && prompt.accountId !== user.accountId) {
       return;
     }
-    const result = await this.promptService.sendPrompt(prompt, user, params);
+    const result = await this.promptService.sendPrompt(prompt, user, thread);
     return result;
   }
 

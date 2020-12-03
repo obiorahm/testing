@@ -36,18 +36,18 @@ export class MessageService {
     message.receiverId = params.receiverId;
     message.threadId = params.threadId;
     message.pairId = params.pairId;
-    message.promptResponseId = params.promptResponseId;
+    message.promptResponses = params.promptResponses;
     message.accountId = params.accountId;
     message.createdAt = new Date();
     // Add to thread
     const threadCollection = getRepository(Thread);
     const thread = await threadCollection.findById(params.threadId);
-    thread.lastMessage = convertToObject(message);
-    await threadCollection.update(thread);
+    thread.lastMessage = convertToObject(message); // TODO: this is merging instead of overwriting
+    await threadCollection.update(thread); 
     // Create message
     const result = await messageCollection.create(message);
     await this.sendPushNotification(result);
-    // TODO: send push notification / handle integrations (slack message, etc.)
+    // TODO: handle integrations (slack message, etc.)
     return result;
   }
 
