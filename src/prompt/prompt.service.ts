@@ -102,11 +102,13 @@ export class PromptService {
       createdAt: new Date()
     }
     const thread = await this.threadService.getThread(promptResponse.threadId);
+    let receiverIds = [];
     thread.userIds.forEach((userId) => {
       if (userId !== promptResponse.userId) {
-        messageData.receiverId = userId;
+        receiverIds.push(userId);
       }
-    })
+    });
+    messageData.receiverIds = receiverIds;
     if (thread.pairId) {
       messageData.pairId = thread.pairId;
     }

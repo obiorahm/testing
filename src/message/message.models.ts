@@ -6,7 +6,7 @@ export class Message {
   body: string;
   type: string; // message, prompt, promptResponse
   senderId?: string; // can be null if prompt
-  receiverId?: string; // can be null if prompt response
+  receiverIds?: Array<string>; // can be null if prompt response
   threadId: string;
   pairId?: string;
   promptResponses?: any; // used to group message with prompt

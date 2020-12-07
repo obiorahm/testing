@@ -33,7 +33,6 @@ export class MessageService {
     message.body = params.body;
     message.type = params.type;
     message.senderId = params.senderId;
-    message.receiverId = params.receiverId;
     message.threadId = params.threadId;
     message.pairId = params.pairId;
     message.promptResponses = params.promptResponses;
@@ -45,6 +44,9 @@ export class MessageService {
     thread.lastMessage = convertToObject(message); // TODO: this is merging instead of overwriting
     await threadCollection.update(thread); 
     // Create message
+    message.receiverIds = thread.userIds.filter((userId) => {
+      return userId !== params.senderId;
+    });
     const result = await messageCollection.create(message);
     await this.sendPushNotification(result);
     // TODO: handle integrations (slack message, etc.)
@@ -52,35 +54,37 @@ export class MessageService {
   }
 
   async sendPushNotification(message: Message) {
-    if (!message.receiverId) {
+    if (!message.receiverIds) {
       return;
     }
     const userCollection = getRepository(User);
-    const receiver = await userCollection.findById(message.receiverId);
-    let title = 'New Prompt'
-    if (message.senderId) {
-      const sender = await userCollection.findById(message.senderId);
-      title = 'Message from ' + sender.firstName;
+    for (const receiverId of message.receiverIds) {
+      const receiver = await userCollection.findById(receiverId);
+      let title = 'New Prompt';
+      if (message.senderId) {
+        const sender = await userCollection.findById(message.senderId);
+        title = 'Message from ' + sender.firstName;
+      }
+      if (!receiver.pushToken) {
+        continue;
+      }
+      const notification = {
+        to: receiver.pushToken,
+        sound: 'default',
+        title: title,
+        body: message.body
+      };
+    
+      await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Accept-encoding': 'gzip, deflate',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(notification),
+      });
     }
-    if (!receiver.pushToken) {
-      return;
-    }
-    const notification = {
-      to: receiver.pushToken,
-      sound: 'default',
-      title: title,
-      body: message.body
-    };
-  
-    await fetch('https://exp.host/--/api/v2/push/send', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Accept-encoding': 'gzip, deflate',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(notification),
-    });
   }
 
 }
