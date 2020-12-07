@@ -18,9 +18,24 @@ export class UserService {
   }
 
   async createUser(params: any): Promise<any> {
+    if (!params.password || params.password !== params.confirmPassword) {
+      return;
+    }
+    // If firebase user exists, use that, if not create one
+    let firebaseUser;
+    if (params.firebaseUserId) {
+      firebaseUser = await this.getFirebaseUser(params.firebaseUserId);
+    } else {
+      firebaseUser = await this.firebase.auth.createUser({
+        email: params.email,
+        emailVerified: false,
+        password: params.password,
+        displayName: params.firstName + ' ' + params.lastName,
+      });
+    }
     const userCollection = getRepository(User);
     const user = new User();
-    // TODO: create firebase user and assign user.id to firebase uid
+    user.id = firebaseUser.uid;
     user.firstName = params.firstName;
     user.lastName = params.lastName;
     user.email = params.email;

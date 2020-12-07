@@ -24,12 +24,29 @@ export class UserController {
     return user;
   }
 
+  // Create firebase user and pairup user
   @Post('create')
   @UseGuards(AuthGuard('firebase'))
   async createUser(@Request() req, @Body() body): Promise<any> {
     const user = await this.userService.getUser(req.user.uid);
+    if (!user.isAdmin) {
+      return;
+    }
     const params: any = body;
-    params.accountId = user.accountId;
+    if (!user.isSuperAdmin) {
+      params.accountId = user.accountId;
+    }
+    const result = await this.userService.createUser(params);
+    return result;
+  }
+
+  // Existing firebase user register for pairup
+  @Post('register')
+  @UseGuards(AuthGuard('firebase'))
+  async registerUser(@Request() req, @Body() body): Promise<any> {
+    const params: any = body;
+    params.firebaseUserId = req.user.uid;
+    params.isAdmin = false;
     const result = await this.userService.createUser(params);
     return result;
   }
