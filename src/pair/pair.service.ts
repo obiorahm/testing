@@ -76,6 +76,7 @@ export class PairService {
     // Create thread
     await this.threadService.createThread({
       userIds: userIds,
+      pairId: pair.id,
       accountId: pairRequest.accountId
     })
     return pair;
