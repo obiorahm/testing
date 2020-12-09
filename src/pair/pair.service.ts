@@ -20,6 +20,7 @@ export class PairService {
     pair.accountId = params.accountId;
     pair.createdAt = new Date();
     const result = await pairCollection.create(pair);
+    // TODO: should we just create the thread now ?
     return result
   }
 
