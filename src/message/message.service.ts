@@ -27,6 +27,9 @@ export class MessageService {
   }
 
   async createMessage(params: any) {
+    // Get thread
+    const threadCollection = getRepository(Thread);
+    const thread = await threadCollection.findById(params.threadId);
     // Set message fields
     const messageCollection = getRepository(Message);
     const message: Message = new Message();
@@ -34,13 +37,11 @@ export class MessageService {
     message.type = params.type;
     message.senderId = params.senderId;
     message.threadId = params.threadId;
-    message.pairId = params.pairId;
+    message.pairId = thread.pairId;
     message.promptResponses = params.promptResponses;
     message.accountId = params.accountId;
     message.createdAt = new Date();
     // Add to thread
-    const threadCollection = getRepository(Thread);
-    const thread = await threadCollection.findById(params.threadId);
     thread.lastMessage = convertToObject(message); // TODO: this is merging instead of overwriting
     await threadCollection.update(thread); 
     // Create message
