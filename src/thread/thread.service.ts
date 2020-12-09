@@ -31,7 +31,6 @@ export class ThreadService {
     thread.userIds = params.userIds;
     thread.accountId = params.accountId;
     thread.createdAt = new Date();
-    thread.isReflection = params.isReflection;
     const result = await threadCollection.create(thread);
     return result
   }

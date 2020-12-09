@@ -30,7 +30,7 @@ export class PromptController {
       return;
     }
     // If not super admin force account to user's account
-    if (!user.isSuperAdmin) {
+    if (!user.isSuperAdmin || !params.accountId) {
       params.accountId = user.accountId;
     }
     params.createdById = user.id;
