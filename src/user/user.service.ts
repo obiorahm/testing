@@ -18,9 +18,6 @@ export class UserService {
   }
 
   async createUser(params: any): Promise<any> {
-    if (!params.password || params.password !== params.confirmPassword) {
-      return;
-    }
     // If firebase user exists, use that, if not create one
     let firebaseUser;
     if (params.firebaseUserId) {
@@ -40,6 +37,7 @@ export class UserService {
     user.lastName = params.lastName;
     user.email = params.email;
     user.isAdmin = params.isAdmin;
+    user.isSuperAdmin = params.isSuperAdmin || false;
     user.accountId = params.accountId;
     const result = await userCollection.create(user);
     return result

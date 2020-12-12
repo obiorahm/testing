@@ -20,7 +20,11 @@ export class UserController {
   @Get(':userId')
   @UseGuards(AuthGuard('firebase'))
   async getById(@Request() req, @Param() params): Promise<User> {
+    const loggedInUser = await this.userService.getUser(req.user.uid);
     const user = await this.userService.getUser(params.userId);
+    if (!loggedInUser.isSuperAdmin && user.accountId !== loggedInUser.accountId) {
+      return;
+    }
     return user;
   }
 
@@ -35,6 +39,10 @@ export class UserController {
     const params: any = body;
     if (!user.isSuperAdmin) {
       params.accountId = user.accountId;
+      // Only super admins can create super admins
+      if (!user.isSuperAdmin) {
+        params.isSuperAdmin = false;
+      }
     }
     const result = await this.userService.createUser(params);
     return result;
@@ -45,6 +53,9 @@ export class UserController {
   @UseGuards(AuthGuard('firebase'))
   async registerUser(@Request() req, @Body() body): Promise<any> {
     const params: any = body;
+    if (!params.password || params.password !== params.confirmPassword) {
+      return;
+    }
     params.firebaseUserId = req.user.uid;
     params.isAdmin = false;
     const result = await this.userService.createUser(params);
