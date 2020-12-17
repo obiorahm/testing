@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { getRepository } from 'fireorm';
 import { ThreadService } from 'src/thread/thread.service';
+import { User } from 'src/user/user.models';
 import { Pair, PairRequest } from './pair.models';
 
 const PAIR_PAGE_SIZE = 10;
@@ -17,13 +18,39 @@ export class PairService {
     const pair: Pair = new Pair();
     pair.isActive = params.isActive;
     pair.userIds = params.userIds;
+    const userCollection = getRepository(User);
+    const userNames = [];
+    for (const userId of pair.userIds) {
+      console.log(userId)
+      const user = await userCollection.findById(userId);
+      userNames.push(`${user.firstName} ${user.lastName}`)
+    }
+    pair.userNames = userNames;
     pair.accountId = params.accountId;
     pair.createdAt = new Date();
     const result = await pairCollection.create(pair);
-    // TODO: should we just create the thread now ?
-    return result
+    // Create thread
+    await this.threadService.createThread({
+      userIds: result.userIds,
+      pairId: result.id,
+      accountId: result.accountId
+    })
+    return result;
   }
 
+  async getPairsByAccount(params: any, page: number = 0) {
+    const pairCollection = getRepository(Pair);
+    // TODO: Pagination
+    const pairs: Array<Pair> = await pairCollection.whereEqualTo(
+      'accountId', params.accountId 
+    ).orderByDescending(
+      'createdAt'
+    ).limit(
+      PAIR_PAGE_SIZE
+    ).find();
+    return pairs;
+  }
+  
   async getPairsByUser(userId: string, page: number = 0) {
     const pairCollection = getRepository(Pair);
     // TODO: Pagination
@@ -72,13 +99,7 @@ export class PairService {
       isActive: true,
       userIds: userIds,
       accountId: pairRequest.accountId
-    })
-    // Create thread
-    await this.threadService.createThread({
-      userIds: userIds,
-      pairId: pair.id,
-      accountId: pairRequest.accountId
-    })
+    });
     return pair;
   }
 }

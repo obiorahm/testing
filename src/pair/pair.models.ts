@@ -5,6 +5,7 @@ export class Pair {
   id: string;
   isActive: boolean;
   userIds: Array<string>;
+  userNames: Array<string>;
   accountId: string;
   createdById?: string;
   createdAt: Date;

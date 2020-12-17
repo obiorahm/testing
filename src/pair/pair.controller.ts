@@ -20,6 +20,22 @@ export class PairController {
     const pairs: Array<Pair> = await this.pairService.getPairsByUser(req.user.uid);
     return pairs;
   }
+
+  @Get('list')
+  @UseGuards(AuthGuard('firebase'))
+  async getPairsList(@Request() req): Promise<Array<Pair>> {
+    const user: User = await this.userService.getUser(req.user.uid);
+    // Admin only
+    if (!user.isAdmin) {
+      return;
+    }
+    const params = {
+      accountId: user.accountId
+    }
+    // TODO: allow superAdmin to pass in accountId
+    const pairs: Array<Pair> = await this.pairService.getPairsByAccount(params);
+    return pairs;
+  }
   
   @Post('create')
   @UseGuards(AuthGuard('firebase'))
