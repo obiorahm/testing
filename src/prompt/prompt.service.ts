@@ -26,6 +26,7 @@ export class PromptService {
     prompt.type = params.type;
     prompt.category = params.category;
     prompt.content = params.content;
+    prompt.trackId = params.trackId;
     prompt.accountId = params.accountId;
     prompt.createdById = params.createdById;
     prompt.createdAt = new Date();
@@ -42,6 +43,7 @@ export class PromptService {
       const promptResponse: PromptResponse = new PromptResponse();
       promptResponse.hasResponded = false;
       promptResponse.promptId = prompt.id;
+      promptResponse.trackId = prompt.trackId;
       promptResponse.userId = userId;
       promptResponse.threadId = thread.id;
       promptResponse.pairId = thread.pairId;
@@ -89,6 +91,7 @@ export class PromptService {
       response: response,
       time: new Date()
     });
+    promptResponse.hasResponded = true;
     const promptResponseCollection = getRepository(PromptResponse);
     const updatedPromptResponse = await promptResponseCollection.update(promptResponse);
     // Add message to thread

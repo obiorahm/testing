@@ -8,6 +8,8 @@ export class Prompt {
   content: string;
   links?: Array<string>;
   accountId?: string;
+  trackId?: string;
+  // trackName?: string; TODO: save this for convenience ?
   createdById?: string; // User that added the prompt
   createdAt: Date;
 }
@@ -22,6 +24,7 @@ export class PromptResponse {
   userId: string;
   threadId: string;
   pairId?: string;
+  trackId?: string;
   accountId: string;
   sentById?: string;
   createdAt: Date;

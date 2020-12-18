@@ -12,6 +12,9 @@ import { ThreadService } from './thread/thread.service';
 import { ThreadModule } from './thread/thread.module';
 import { PairModule } from './pair/pair.module';
 import { PromptModule } from './prompt/prompt.module';
+import { TrackService } from './track/track.service';
+import { TrackController } from './track/track.controller';
+import { TrackModule } from './track/track.module';
 
 @Module({
   imports: [
@@ -28,11 +31,13 @@ import { PromptModule } from './prompt/prompt.module';
     ThreadModule,
     PairModule,
     PromptModule,
+    TrackModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, TrackController],
   providers: [
     AppService,
     ThreadService,
+    TrackService,
   ],
 })
 export class AppModule {}
