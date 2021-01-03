@@ -6,5 +6,6 @@ export class Track {
   name: string;
   accountId?: string;
   createdById?: string;
+  prompts: Array<any>;
   createdAt: Date;
 }

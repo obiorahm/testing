@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Param, Post, Get, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Thread } from 'src/thread/thread.models';
 import { ThreadService } from 'src/thread/thread.service';
@@ -35,6 +35,36 @@ export class PromptController {
     }
     params.createdById = user.id;
     const result = await this.promptService.createPrompt(params);
+    return result;
+  }
+
+  @Post('edit/:promptId')
+  @UseGuards(AuthGuard('firebase'))
+  async editPrompt(@Request() req, @Body() body, @Param('promptId') promptId): Promise<Prompt> {
+    const user: User = await this.userService.getUser(req.user.uid);
+    // Admin only
+    if (!user.isAdmin) {
+      return;
+    }
+    let params: any = body;
+    params.id = promptId;
+    // Super admin can create prompts for anyone
+    if (!user.isSuperAdmin && user.accountId !== params.accountId) {
+      return;
+    }
+    // If not super admin force account to user's account
+    if (!user.isSuperAdmin || !params.accountId) {
+      params.accountId = user.accountId;
+    }
+    params.editedById = user.id;
+    const prompt: Prompt = await this.promptService.getPrompt(promptId);
+    if (!prompt) {
+      return;
+    }
+    if (!user.isSuperAdmin && user.accountId !== prompt.accountId) {
+      return;
+    }
+    const result = await this.promptService.editPrompt(params);
     return result;
   }
 
@@ -80,6 +110,17 @@ export class PromptController {
       data.response
     );
     return result;
+  }
+
+  @Get(':promptId')
+  @UseGuards(AuthGuard('firebase'))
+  async getAccountTracks(@Request() req, @Param() params): Promise<Prompt> {
+    const user: User = await this.userService.getUser(req.user.uid);
+    const prompt = await this.promptService.getPrompt(params.promptId);
+    if (!user.isSuperAdmin && prompt.accountId && user.accountId !== prompt.accountId) {
+      return;
+    }
+    return prompt;
   }
 
 }

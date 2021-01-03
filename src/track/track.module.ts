@@ -6,6 +6,7 @@ import { TrackService } from './track.service';
 @Module({
   providers: [TrackService],
   controllers: [TrackController],
+  exports: [TrackService],
   imports: [
     UserModule
   ]

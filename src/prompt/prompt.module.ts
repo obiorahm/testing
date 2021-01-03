@@ -4,6 +4,7 @@ import { PromptController } from './prompt.controller';
 import { UserModule } from 'src/user/user.module';
 import { ThreadModule } from 'src/thread/thread.module';
 import { MessageModule } from 'src/message/message.module';
+import { TrackModule } from 'src/track/track.module';
 
 @Module({
   providers: [PromptService],
@@ -11,7 +12,8 @@ import { MessageModule } from 'src/message/message.module';
   imports: [
     UserModule,
     ThreadModule,
-    MessageModule
+    MessageModule,
+    TrackModule
   ]
 })
 export class PromptModule {}
