@@ -31,6 +31,7 @@ export class ThreadService {
     thread.userIds = params.userIds;
     thread.accountId = params.accountId;
     thread.pairId = params.pairId;
+    thread.trackId = params.trackId;
     thread.createdAt = new Date();
     const result = await threadCollection.create(thread);
     return result
