@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { TrackService } from './track.service';
 import { UserService } from 'src/user/user.service';
@@ -41,6 +41,27 @@ export class TrackController {
     params.accountId = user.accountId;
     params.createdById = user.id;
     const result = await this.trackService.createTrack(params);
+    return result;
+  }
+
+  @Post('edit/:trackId')
+  @UseGuards(AuthGuard('firebase'))
+  async editTrack(@Request() req, @Body() body, @Param('trackId') trackId): Promise<Track> {
+    const user: User = await this.userService.getUser(req.user.uid);
+    // Admin only
+    if (!user.isAdmin) {
+      return;
+    }
+    let params: any = body;
+    params.id = trackId;
+    const track: Track = await this.trackService.getTrackById(trackId);
+    if (!track) {
+      return;
+    }
+    if (!user.isSuperAdmin && user.accountId !== track.accountId) {
+      return;
+    }
+    const result = await this.trackService.editTrack(params);
     return result;
   }
 

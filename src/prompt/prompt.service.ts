@@ -3,6 +3,7 @@ import { getRepository } from 'fireorm';
 import { MessageService } from 'src/message/message.service';
 import { Thread } from 'src/thread/thread.models';
 import { ThreadService } from 'src/thread/thread.service';
+import { TrackService } from 'src/track/track.service';
 import { User } from 'src/user/user.models';
 import { Prompt, PromptResponse } from './prompt.models';
 
@@ -12,6 +13,7 @@ export class PromptService {
   constructor(
     private readonly messageService: MessageService,
     private readonly threadService: ThreadService,
+    private readonly trackService: TrackService
   ) {}
 
   async getPrompt(promptId: string) {
@@ -31,6 +33,22 @@ export class PromptService {
     prompt.createdById = params.createdById;
     prompt.createdAt = new Date();
     const result = await promptCollection.create(prompt);
+    if (prompt.trackId) {
+      this.trackService.editTrackPrompts(prompt);
+    }
+    return result;
+  }
+
+  async editPrompt(params: any) {
+    const promptCollection = getRepository(Prompt);
+    const prompt: Prompt = await promptCollection.findById(params.id);
+    prompt.type = params.type;
+    prompt.category = params.category;
+    prompt.content = params.content;
+    const result = await promptCollection.update(prompt);
+    if (prompt.trackId) {
+      this.trackService.editTrackPrompts(prompt);
+    }
     return result;
   }
 

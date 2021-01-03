@@ -9,5 +9,7 @@ export class Thread {
   createdAt: Date;
   userIds: Array<string>;
   pairId?: string;
+  trackId?: string;
+  completedPromptIds?: Array<string>; // record progress of the track
   accountId: string;
 }

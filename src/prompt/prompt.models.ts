@@ -1,16 +1,17 @@
 import { Collection } from 'fireorm';
 
-@Collection('prompt')
+@Collection('prompts')
 export class Prompt {
   id: string;
   type: string; // solo, group, training
-  category: string;  // leadership, inclusion, 
+  category?: string;  // leadership, inclusion, 
   content: string;
   links?: Array<string>;
   accountId?: string;
   trackId?: string;
   // trackName?: string; TODO: save this for convenience ?
   createdById?: string; // User that added the prompt
+  editedById?: string; // User that most recently edited the prompt
   createdAt: Date;
 }
 
